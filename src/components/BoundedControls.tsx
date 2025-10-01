@@ -36,14 +36,15 @@ export const BoundedControls = () => {
     lastTouchX: 0,
     lastTouchY: 0,
     touchStartDistance: 0,
-    currentZoom: 8,
+    isPinching: false,
+    zoomVelocity: 0,
   });
 
   const rotation = useRef({ yaw: 0, pitch: 0 });
 
   const moveSpeed = 0.3;
-  const lookSpeed = 0.005;
-  const zoomSpeed = 0.05;
+  const lookSpeed = 0.003;
+  const zoomSpeed = 0.02;
   const velocity = useRef(new THREE.Vector3());
   const direction = useRef(new THREE.Vector3());
 
@@ -75,14 +76,17 @@ export const BoundedControls = () => {
       if (!isMobile) return;
       
       if (e.touches.length === 1) {
-        // Un dedo - preparar para movimiento/rotación
+        // Un dedo - preparar para rotación
+        touchState.current.isPinching = false;
         touchState.current.lastTouchX = e.touches[0].clientX;
         touchState.current.lastTouchY = e.touches[0].clientY;
       } else if (e.touches.length === 2) {
         // Dos dedos - preparar para zoom
+        touchState.current.isPinching = true;
         const dx = e.touches[0].clientX - e.touches[1].clientX;
         const dy = e.touches[0].clientY - e.touches[1].clientY;
         touchState.current.touchStartDistance = Math.sqrt(dx * dx + dy * dy);
+        touchState.current.zoomVelocity = 0;
       }
     };
 
@@ -90,28 +94,31 @@ export const BoundedControls = () => {
       if (!isMobile) return;
       e.preventDefault();
 
-      if (e.touches.length === 1) {
-        // Un dedo - rotar cámara y mover
+      if (e.touches.length === 1 && !touchState.current.isPinching) {
+        // Un dedo - rotar cámara suavemente
         const deltaX = e.touches[0].clientX - touchState.current.lastTouchX;
         const deltaY = e.touches[0].clientY - touchState.current.lastTouchY;
         
-        // Rotar cámara
+        // Rotar cámara con límites más suaves
         rotation.current.yaw -= deltaX * lookSpeed;
         rotation.current.pitch -= deltaY * lookSpeed;
-        rotation.current.pitch = Math.max(-Math.PI / 3, Math.min(Math.PI / 3, rotation.current.pitch));
+        // Limitar el pitch para no mirar demasiado arriba o abajo
+        rotation.current.pitch = Math.max(-Math.PI / 4, Math.min(Math.PI / 4, rotation.current.pitch));
 
         touchState.current.lastTouchX = e.touches[0].clientX;
         touchState.current.lastTouchY = e.touches[0].clientY;
 
       } else if (e.touches.length === 2) {
-        // Dos dedos - zoom (acercar/alejar)
+        // Dos dedos - zoom (calcular velocidad de zoom)
         const dx = e.touches[0].clientX - e.touches[1].clientX;
         const dy = e.touches[0].clientY - e.touches[1].clientY;
         const distance = Math.sqrt(dx * dx + dy * dy);
         
-        const delta = distance - touchState.current.touchStartDistance;
-        touchState.current.currentZoom -= delta * zoomSpeed;
-        touchState.current.currentZoom = Math.max(2, Math.min(15, touchState.current.currentZoom));
+        if (touchState.current.touchStartDistance > 0) {
+          const delta = distance - touchState.current.touchStartDistance;
+          // Actualizar velocidad de zoom (positivo = acercar, negativo = alejar)
+          touchState.current.zoomVelocity = delta * zoomSpeed;
+        }
         
         touchState.current.touchStartDistance = distance;
       }
@@ -121,8 +128,16 @@ export const BoundedControls = () => {
       if (!isMobile) return;
       
       if (e.touches.length === 0) {
-        // Reset
+        // Reset completo al soltar todos los dedos
         touchState.current.touchStartDistance = 0;
+        touchState.current.isPinching = false;
+        touchState.current.zoomVelocity = 0;
+      } else if (e.touches.length === 1) {
+        // Si queda un dedo, detener el zoom
+        touchState.current.isPinching = false;
+        touchState.current.zoomVelocity = 0;
+        touchState.current.lastTouchX = e.touches[0].clientX;
+        touchState.current.lastTouchY = e.touches[0].clientY;
       }
     };
 
@@ -180,21 +195,21 @@ export const BoundedControls = () => {
       velocity.current.add(right.clone().multiplyScalar(-moveSpeed));
     }
 
+    // Aplicar zoom en móvil (movimiento hacia adelante/atrás)
+    if (isMobile && touchState.current.zoomVelocity !== 0) {
+      const zoomMovement = direction.current.clone().multiplyScalar(touchState.current.zoomVelocity);
+      velocity.current.add(zoomMovement);
+    }
+
     // Aplicar movimiento con límites
     const newPosition = camera.position.clone().add(velocity.current);
     
-    // Limitar posición dentro de los bounds
+    // Limitar posición dentro de los bounds con un pequeño margen
     newPosition.x = Math.max(bounds.minX, Math.min(bounds.maxX, newPosition.x));
     newPosition.z = Math.max(bounds.minZ, Math.min(bounds.maxZ, newPosition.z));
     newPosition.y = fixedHeight; // Mantener altura fija
 
     camera.position.copy(newPosition);
-
-    // Aplicar zoom en móvil (mover la cámara adelante/atrás)
-    if (isMobile) {
-      const zoomDirection = direction.current.clone().multiplyScalar(8 - touchState.current.currentZoom);
-      camera.position.add(zoomDirection.multiplyScalar(0.1));
-    }
   });
 
   // Solo usar PointerLockControls en escritorio
