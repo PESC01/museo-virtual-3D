@@ -69,56 +69,62 @@ export const MuseumScene = () => {
       
       {/* Floor */}
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, 0]} receiveShadow>
-        <planeGeometry args={[30, 30]} />
+        <planeGeometry args={[20, 20]} />
         <meshStandardMaterial color="#5a5550" roughness={0.8} metalness={0.2} />
       </mesh>
       
       {/* Back wall */}
-      <mesh position={[0, 3, -8]} receiveShadow>
-        <planeGeometry args={[30, 8]} />
+      <mesh position={[0, 3, -10]} receiveShadow>
+        <planeGeometry args={[20, 8]} />
+        <meshStandardMaterial color="#4a4a4a" roughness={0.9} />
+      </mesh>
+      
+      {/* Front wall (to close the room) */}
+      <mesh position={[0, 3, 10]} rotation={[0, Math.PI, 0]} receiveShadow>
+        <planeGeometry args={[20, 8]} />
         <meshStandardMaterial color="#4a4a4a" roughness={0.9} />
       </mesh>
       
       {/* Left wall */}
-      <mesh position={[-15, 3, 0]} rotation={[0, Math.PI / 2, 0]} receiveShadow>
-        <planeGeometry args={[30, 8]} />
+      <mesh position={[-10, 3, 0]} rotation={[0, Math.PI / 2, 0]} receiveShadow>
+        <planeGeometry args={[20, 8]} />
         <meshStandardMaterial color="#4a4a4a" roughness={0.9} />
       </mesh>
       
       {/* Right wall */}
-      <mesh position={[15, 3, 0]} rotation={[0, -Math.PI / 2, 0]} receiveShadow>
-        <planeGeometry args={[30, 8]} />
+      <mesh position={[10, 3, 0]} rotation={[0, -Math.PI / 2, 0]} receiveShadow>
+        <planeGeometry args={[20, 8]} />
         <meshStandardMaterial color="#4a4a4a" roughness={0.9} />
       </mesh>
       
       {/* Ceiling */}
       <mesh rotation={[Math.PI / 2, 0, 0]} position={[0, 6, 0]}>
-        <planeGeometry args={[30, 30]} />
+        <planeGeometry args={[20, 20]} />
         <meshStandardMaterial color="#3a3a3a" />
       </mesh>
       
       {/* Artworks on back wall */}
       <ArtworkFrame
-        position={[-5, 2.5, -7.9]}
+        position={[-4, 2.5, -9.9]}
         rotation={[0, 0, 0]}
         imageUrl={artwork1}
       />
       <ArtworkFrame
-        position={[5, 2.5, -7.9]}
+        position={[4, 2.5, -9.9]}
         rotation={[0, 0, 0]}
         imageUrl={artwork2}
       />
       
       {/* Artworks on left wall */}
       <ArtworkFrame
-        position={[-14.9, 2.5, -5]}
+        position={[-9.9, 2.5, 0]}
         rotation={[0, Math.PI / 2, 0]}
         imageUrl={artwork3}
       />
       
       {/* Artworks on right wall */}
       <ArtworkFrame
-        position={[14.9, 2.5, -5]}
+        position={[9.9, 2.5, 0]}
         rotation={[0, -Math.PI / 2, 0]}
         imageUrl={artwork4}
       />
