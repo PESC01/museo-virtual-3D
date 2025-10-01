@@ -1,10 +1,15 @@
 import { useTexture, Preload } from "@react-three/drei";
 import { useMemo } from "react";
 import * as THREE from "three";
-import artwork1 from "@/assets/artwork1.jpg";
-import artwork2 from "@/assets/artwork2.jpg";
-import artwork3 from "@/assets/artwork3.jpg";
-import artwork4 from "@/assets/artwork4.jpg";
+import img1 from "@/assets/IMG-20241221-WA0000.jpg";
+import img2 from "@/assets/IMG-20241221-WA0001.jpg";
+import img3 from "@/assets/IMG-20250306-WA0023.jpg";
+import img4 from "@/assets/IMG-20250619-WA0042.jpg";
+import img5 from "@/assets/IMG-20250625-WA0157.jpg";
+import img6 from "@/assets/IMG-20250701-WA0012.jpg";
+import img7 from "@/assets/IMG-20250704-WA0028.jpg";
+import img8 from "@/assets/IMG-20250711-WA0000.jpg";
+import img9 from "@/assets/IMG-20250713-WA0020.jpg";
 
 const ArtworkFrame = ({ position, rotation, imageUrl }: { position: [number, number, number]; rotation: [number, number, number]; imageUrl: string }) => {
   const texture = useTexture(imageUrl);
@@ -109,28 +114,55 @@ export const MuseumScene = () => {
       
       {/* Artworks on back wall */}
       <ArtworkFrame
-        position={[-4, 2.5, -9.9]}
+        position={[-6, 2.5, -9.9]}
         rotation={[0, 0, 0]}
-        imageUrl={artwork1}
+        imageUrl={img1}
       />
       <ArtworkFrame
-        position={[4, 2.5, -9.9]}
+        position={[0, 2.5, -9.9]}
         rotation={[0, 0, 0]}
-        imageUrl={artwork2}
+        imageUrl={img2}
+      />
+      <ArtworkFrame
+        position={[6, 2.5, -9.9]}
+        rotation={[0, 0, 0]}
+        imageUrl={img3}
       />
       
       {/* Artworks on left wall */}
       <ArtworkFrame
-        position={[-9.9, 2.5, 0]}
+        position={[-9.9, 2.5, -4]}
         rotation={[0, Math.PI / 2, 0]}
-        imageUrl={artwork3}
+        imageUrl={img4}
+      />
+      <ArtworkFrame
+        position={[-9.9, 2.5, 2]}
+        rotation={[0, Math.PI / 2, 0]}
+        imageUrl={img5}
       />
       
       {/* Artworks on right wall */}
       <ArtworkFrame
-        position={[9.9, 2.5, 0]}
+        position={[9.9, 2.5, -4]}
         rotation={[0, -Math.PI / 2, 0]}
-        imageUrl={artwork4}
+        imageUrl={img6}
+      />
+      <ArtworkFrame
+        position={[9.9, 2.5, 2]}
+        rotation={[0, -Math.PI / 2, 0]}
+        imageUrl={img7}
+      />
+      
+      {/* Artworks on front wall */}
+      <ArtworkFrame
+        position={[-4, 2.5, 9.9]}
+        rotation={[0, Math.PI, 0]}
+        imageUrl={img8}
+      />
+      <ArtworkFrame
+        position={[4, 2.5, 9.9]}
+        rotation={[0, Math.PI, 0]}
+        imageUrl={img9}
       />
       
       {/* Additional lighting accents */}
