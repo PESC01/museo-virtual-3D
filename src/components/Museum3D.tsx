@@ -3,10 +3,11 @@ import { PerspectiveCamera } from "@react-three/drei";
 import { Suspense } from "react";
 import { MuseumScene } from "./MuseumScene";
 import { BoundedControls } from "./BoundedControls";
+import { MobileControls } from "./MobileControls";
 
 export const Museum3D = () => {
   return (
-    <div className="w-full h-screen bg-background">
+    <div className="w-full h-screen bg-background relative">
       <Canvas 
         shadows 
         gl={{ 
@@ -23,6 +24,7 @@ export const Museum3D = () => {
           <MuseumScene />
         </Suspense>
       </Canvas>
+      <MobileControls />
     </div>
   );
 };
