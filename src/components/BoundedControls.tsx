@@ -33,17 +33,17 @@ export const BoundedControls = () => {
 
   // Controles táctiles para móvil
   const touchState = useRef({
-    moveX: 0,
-    moveY: 0,
-    lookStartX: 0,
-    lookStartY: 0,
-    isLooking: false,
+    lastTouchX: 0,
+    lastTouchY: 0,
+    touchStartDistance: 0,
+    currentZoom: 8,
   });
 
   const rotation = useRef({ yaw: 0, pitch: 0 });
 
   const moveSpeed = 0.3;
-  const lookSpeed = 0.002;
+  const lookSpeed = 0.005;
+  const zoomSpeed = 0.05;
   const velocity = useRef(new THREE.Vector3());
   const direction = useRef(new THREE.Vector3());
 
@@ -70,26 +70,19 @@ export const BoundedControls = () => {
       }
     };
 
-    // Touch controls para móvil
+    // Touch controls mejorados para móvil
     const handleTouchStart = (e: TouchEvent) => {
       if (!isMobile) return;
       
-      for (let i = 0; i < e.touches.length; i++) {
-        const touch = e.touches[i];
-        const x = touch.clientX;
-        const width = window.innerWidth;
-
-        // Lado izquierdo para movimiento, derecho para mirar
-        if (x < width / 2) {
-          // Joystick de movimiento (izquierda)
-          touchState.current.moveX = (touch.clientX - width / 4) / (width / 4);
-          touchState.current.moveY = (touch.clientY - window.innerHeight / 2) / (window.innerHeight / 2);
-        } else {
-          // Área de mirar (derecha)
-          touchState.current.isLooking = true;
-          touchState.current.lookStartX = touch.clientX;
-          touchState.current.lookStartY = touch.clientY;
-        }
+      if (e.touches.length === 1) {
+        // Un dedo - preparar para movimiento/rotación
+        touchState.current.lastTouchX = e.touches[0].clientX;
+        touchState.current.lastTouchY = e.touches[0].clientY;
+      } else if (e.touches.length === 2) {
+        // Dos dedos - preparar para zoom
+        const dx = e.touches[0].clientX - e.touches[1].clientX;
+        const dy = e.touches[0].clientY - e.touches[1].clientY;
+        touchState.current.touchStartDistance = Math.sqrt(dx * dx + dy * dy);
       }
     };
 
@@ -97,36 +90,40 @@ export const BoundedControls = () => {
       if (!isMobile) return;
       e.preventDefault();
 
-      for (let i = 0; i < e.touches.length; i++) {
-        const touch = e.touches[i];
-        const x = touch.clientX;
-        const width = window.innerWidth;
+      if (e.touches.length === 1) {
+        // Un dedo - rotar cámara y mover
+        const deltaX = e.touches[0].clientX - touchState.current.lastTouchX;
+        const deltaY = e.touches[0].clientY - touchState.current.lastTouchY;
+        
+        // Rotar cámara
+        rotation.current.yaw -= deltaX * lookSpeed;
+        rotation.current.pitch -= deltaY * lookSpeed;
+        rotation.current.pitch = Math.max(-Math.PI / 3, Math.min(Math.PI / 3, rotation.current.pitch));
 
-        if (x < width / 2) {
-          // Actualizar joystick de movimiento
-          touchState.current.moveX = (touch.clientX - width / 4) / (width / 4);
-          touchState.current.moveY = (touch.clientY - window.innerHeight / 2) / (window.innerHeight / 2);
-        } else if (touchState.current.isLooking) {
-          // Actualizar rotación de cámara
-          const deltaX = touch.clientX - touchState.current.lookStartX;
-          const deltaY = touch.clientY - touchState.current.lookStartY;
-          
-          rotation.current.yaw -= deltaX * lookSpeed;
-          rotation.current.pitch -= deltaY * lookSpeed;
-          rotation.current.pitch = Math.max(-Math.PI / 2, Math.min(Math.PI / 2, rotation.current.pitch));
+        touchState.current.lastTouchX = e.touches[0].clientX;
+        touchState.current.lastTouchY = e.touches[0].clientY;
 
-          touchState.current.lookStartX = touch.clientX;
-          touchState.current.lookStartY = touch.clientY;
-        }
+      } else if (e.touches.length === 2) {
+        // Dos dedos - zoom (acercar/alejar)
+        const dx = e.touches[0].clientX - e.touches[1].clientX;
+        const dy = e.touches[0].clientY - e.touches[1].clientY;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+        
+        const delta = distance - touchState.current.touchStartDistance;
+        touchState.current.currentZoom -= delta * zoomSpeed;
+        touchState.current.currentZoom = Math.max(2, Math.min(15, touchState.current.currentZoom));
+        
+        touchState.current.touchStartDistance = distance;
       }
     };
 
     const handleTouchEnd = (e: TouchEvent) => {
       if (!isMobile) return;
       
-      touchState.current.moveX = 0;
-      touchState.current.moveY = 0;
-      touchState.current.isLooking = false;
+      if (e.touches.length === 0) {
+        // Reset
+        touchState.current.touchStartDistance = 0;
+      }
     };
 
     document.addEventListener('keydown', handleKeyDown);
@@ -183,12 +180,6 @@ export const BoundedControls = () => {
       velocity.current.add(right.clone().multiplyScalar(-moveSpeed));
     }
 
-    // Movimiento táctil (móvil)
-    if (isMobile && (touchState.current.moveX !== 0 || touchState.current.moveY !== 0)) {
-      velocity.current.add(direction.current.clone().multiplyScalar(-touchState.current.moveY * moveSpeed));
-      velocity.current.add(right.clone().multiplyScalar(-touchState.current.moveX * moveSpeed));
-    }
-
     // Aplicar movimiento con límites
     const newPosition = camera.position.clone().add(velocity.current);
     
@@ -198,6 +189,12 @@ export const BoundedControls = () => {
     newPosition.y = fixedHeight; // Mantener altura fija
 
     camera.position.copy(newPosition);
+
+    // Aplicar zoom en móvil (mover la cámara adelante/atrás)
+    if (isMobile) {
+      const zoomDirection = direction.current.clone().multiplyScalar(8 - touchState.current.currentZoom);
+      camera.position.add(zoomDirection.multiplyScalar(0.1));
+    }
   });
 
   // Solo usar PointerLockControls en escritorio
