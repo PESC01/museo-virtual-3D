@@ -1,0 +1,66 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
+All colors MUST be HSL.
+*/
+
+@layer base {
+  :root {
+    --background: 0 0% 18%;
+    --foreground: 40 10% 95%;
+
+    --card: 0 0% 22%;
+    --card-foreground: 40 10% 95%;
+
+    --popover: 0 0% 22%;
+    --popover-foreground: 40 10% 95%;
+
+    --primary: 42 88% 55%;
+    --primary-foreground: 0 0% 10%;
+
+    --secondary: 0 0% 28%;
+    --secondary-foreground: 40 10% 95%;
+
+    --muted: 0 0% 30%;
+    --muted-foreground: 40 8% 75%;
+
+    --accent: 42 88% 55%;
+    --accent-foreground: 0 0% 10%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 40 10% 95%;
+
+    --border: 0 0% 32%;
+    --input: 0 0% 32%;
+    --ring: 42 88% 55%;
+
+    --radius: 0.75rem;
+
+    /* Museum theme colors */
+    --museum-wall: 0 0% 35%;
+    --museum-floor: 30 8% 40%;
+    --museum-accent: 42 88% 55%;
+    --museum-light: 40 20% 85%;
+    
+    /* Gradients */
+    --gradient-spotlight: linear-gradient(180deg, hsl(var(--museum-accent) / 0.1), transparent);
+    
+    /* Shadows */
+    --shadow-glow: 0 0 40px hsl(var(--museum-accent) / 0.3);
+    
+    /* Animations */
+    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+  }
+}
