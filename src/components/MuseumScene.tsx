@@ -50,7 +50,7 @@ const ArtworkFrame = ({ position, rotation, imageUrl }: { position: [number, num
         position={[0, 2, 2]}
         angle={0.3}
         penumbra={0.5}
-        intensity={50}
+        intensity={80}
         castShadow
         target-position={position}
       />
@@ -62,45 +62,49 @@ export const MuseumScene = () => {
   return (
     <>
       {/* Ambient lighting */}
-      <ambientLight intensity={0.8} />
+      <ambientLight intensity={1.5} />
       
       {/* Main gallery lighting */}
-      <pointLight position={[0, 5, 0]} intensity={50} color="#f5e6d3" />
+      <pointLight position={[0, 5, 0]} intensity={100} color="#f5e6d3" />
+      <pointLight position={[-5, 5, 5]} intensity={70} color="#ffffff" />
+      <pointLight position={[5, 5, 5]} intensity={70} color="#ffffff" />
+      <pointLight position={[-5, 5, -5]} intensity={60} color="#f5e6d3" />
+      <pointLight position={[5, 5, -5]} intensity={60} color="#f5e6d3" />
       
       {/* Floor */}
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, 0]} receiveShadow>
         <planeGeometry args={[20, 20]} />
-        <meshStandardMaterial color="#5a5550" roughness={0.8} metalness={0.2} />
+        <meshStandardMaterial color="#ffffff" roughness={0.8} metalness={0.2} />
       </mesh>
       
       {/* Back wall */}
       <mesh position={[0, 3, -10]} receiveShadow>
         <planeGeometry args={[20, 8]} />
-        <meshStandardMaterial color="#4a4a4a" roughness={0.9} />
+        <meshStandardMaterial color="#ffffff" roughness={0.9} />
       </mesh>
       
       {/* Front wall (to close the room) */}
       <mesh position={[0, 3, 10]} rotation={[0, Math.PI, 0]} receiveShadow>
         <planeGeometry args={[20, 8]} />
-        <meshStandardMaterial color="#4a4a4a" roughness={0.9} />
+        <meshStandardMaterial color="#ffffff" roughness={0.9} />
       </mesh>
       
       {/* Left wall */}
       <mesh position={[-10, 3, 0]} rotation={[0, Math.PI / 2, 0]} receiveShadow>
         <planeGeometry args={[20, 8]} />
-        <meshStandardMaterial color="#4a4a4a" roughness={0.9} />
+        <meshStandardMaterial color="#ffffff" roughness={0.9} />
       </mesh>
       
       {/* Right wall */}
       <mesh position={[10, 3, 0]} rotation={[0, -Math.PI / 2, 0]} receiveShadow>
         <planeGeometry args={[20, 8]} />
-        <meshStandardMaterial color="#4a4a4a" roughness={0.9} />
+        <meshStandardMaterial color="#ffffff" roughness={0.9} />
       </mesh>
       
       {/* Ceiling */}
       <mesh rotation={[Math.PI / 2, 0, 0]} position={[0, 6, 0]}>
         <planeGeometry args={[20, 20]} />
-        <meshStandardMaterial color="#3a3a3a" />
+        <meshStandardMaterial color="#ffffff" />
       </mesh>
       
       {/* Artworks on back wall */}
@@ -134,14 +138,28 @@ export const MuseumScene = () => {
         position={[-5, 5, -5]}
         angle={0.4}
         penumbra={0.5}
-        intensity={60}
+        intensity={100}
         color="#d4af37"
       />
       <spotLight
         position={[5, 5, -5]}
         angle={0.4}
         penumbra={0.5}
-        intensity={60}
+        intensity={100}
+        color="#d4af37"
+      />
+      <spotLight
+        position={[-5, 5, 5]}
+        angle={0.4}
+        penumbra={0.5}
+        intensity={100}
+        color="#d4af37"
+      />
+      <spotLight
+        position={[5, 5, 5]}
+        angle={0.4}
+        penumbra={0.5}
+        intensity={100}
         color="#d4af37"
       />
       
